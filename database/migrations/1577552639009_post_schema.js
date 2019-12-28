@@ -16,6 +16,7 @@ class PostSchema extends Schema {
         .onDelete('SET NULL')
       table.string('title').notNullable()
       table.text('text').notNullable()
+      table.string('type').default('public')
       table.timestamps()
     })
   }

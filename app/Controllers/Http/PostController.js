@@ -19,9 +19,14 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index ({ request, auth }) {
     const { page } = request.get()
-    const posts = await Post.query().paginate(page)
+    const user = await auth.getUser()
+    if (await user.can('read_private_posts')) {
+      const posts = await Post.query().paginate(page)
+      return posts
+    }
+    const posts = await Post.query().where({ type: 'public' }).paginate(page)
     return posts
   }
 
@@ -34,7 +39,7 @@ class PostController {
    * @param {Response} ctx.response
    */
   async store ({ request, response, auth }) {
-    const data = request.only(['title', 'text'])
+    const data = request.only(['title', 'text', 'type'])
     const post = await Post.create({ ...data, user_id: auth.user.id })
     return post
   }
@@ -48,10 +53,17 @@ class PostController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ params, auth, response }) {
     const post = await Post.findOrFail(params.id)
     await post.load('user')
-    return post
+    if (post.type === 'public') {
+      return post
+    }
+    const user = await auth.getUser()
+    if (await user.can('read_private_posts')) {
+      return post
+    }
+    return response.status(403).send({ error: { message: 'You are not allowed to read this post' } })
   }
 
   /**
@@ -64,7 +76,7 @@ class PostController {
    */
   async update ({ params, request, response }) {
     const post = await Post.findOrFail(params.id)
-    const data = request.only(['title', 'text'])
+    const data = request.only(['title', 'text', 'type'])
     post.merge(data)
     await post.save()
     return post

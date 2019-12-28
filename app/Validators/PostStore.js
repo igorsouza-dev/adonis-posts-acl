@@ -8,7 +8,8 @@ class PostStore {
   get rules () {
     return {
       title: 'required',
-      text: 'required'
+      text: 'required',
+      type: 'string'
     }
   }
 }

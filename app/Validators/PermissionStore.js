@@ -7,7 +7,7 @@ class PermissionStore {
 
   get rules () {
     return {
-      title: 'required',
+      name: 'required',
       slug: 'required',
       description: 'required'
     }

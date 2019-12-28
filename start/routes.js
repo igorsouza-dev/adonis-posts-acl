@@ -16,6 +16,13 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+Route.post('users', 'UserController.store').validator('UserStore')
+Route.post('sessions', 'SessionController.store').validator('SessionStore')
+
+Route.group(() => {
+  // auth routes
+  Route.resource('posts', 'PostController')
+    .apiOnly().validator(new Map([
+      [['posts.store'], ['PostStore']]
+    ]))
+}).middleware(['auth'])

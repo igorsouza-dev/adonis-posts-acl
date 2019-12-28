@@ -1,6 +1,6 @@
 'use strict'
 
-class PostStore {
+class PermissionStore {
   get validateAll () {
     return true
   }
@@ -8,9 +8,10 @@ class PostStore {
   get rules () {
     return {
       title: 'required',
-      text: 'required'
+      slug: 'required',
+      description: 'required'
     }
   }
 }
 
-module.exports = PostStore
+module.exports = PermissionStore

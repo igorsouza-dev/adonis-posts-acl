@@ -24,11 +24,15 @@ Route.group(() => {
   Route.resource('posts', 'PostController')
     .apiOnly().validator(new Map([
       [['posts.store'], ['PostStore']]
-    ]))
+    ])).middleware('is:(administrator || moderator)')
   Route.resource('permissions', 'PermissionController')
     .apiOnly().validator(new Map([
       [['permissions.store'], ['PermissionStore']]
     ]))
   Route.resource('roles', 'RoleController')
     .apiOnly()
+  Route.get('me/roles', 'UserRoleController.index')
+  Route.get('me/permissions', 'UserPermissionController.index')
+  Route.get('me', 'UserController.show')
+  Route.put('me', 'UserController.update')
 }).middleware(['auth'])

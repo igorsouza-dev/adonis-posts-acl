@@ -23,7 +23,7 @@ class UserController {
     return user
   }
 
-  async update ({ request, params }) {
+  async update ({ request, auth }) {
     const { permissions, roles, ...data } = request.only([
       'username',
       'email',
@@ -31,7 +31,7 @@ class UserController {
       'permissions',
       'roles'
     ])
-    const user = await User.findOrFail(params.id)
+    const { user } = auth
     user.merge(data)
     await user.save()
 
@@ -42,6 +42,12 @@ class UserController {
     if (permissions) {
       await user.permissions().sync(permissions)
     }
+    await user.loadMany(['roles', 'permissions'])
+    return user
+  }
+
+  async show ({ auth }) {
+    const { user } = auth
     await user.loadMany(['roles', 'permissions'])
     return user
   }

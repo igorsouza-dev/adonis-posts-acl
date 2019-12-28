@@ -1,28 +1,62 @@
-# Adonis API application
+# A Posts API made with Adonis and ACL
 
-This is the boilerplate for creating an API server in AdonisJs, it comes pre-configured with.
+## Adonis ACL
 
-1. Bodyparser
-2. Authentication
-3. CORS
-4. Lucid ORM
-5. Migrations and seeds
+### Setting up
 
-## Setup
+Firs install the library:
 
-Use the adonis command to install the blueprint
+`$ adonis install adonis-acl`
 
-```bash
-adonis new yardstick --api-only
+Edit `app.js` and add the following lines:
+
+```
+const providers = [
+  ...
+  'adonis-acl/providers/AclProvider'
+]
+
+const aceProviders = [
+  ...
+  'adonis-acl/providers/CommandsProvider'
+]
+
+const aliases = {
+  ...
+  Role: 'Adonis/Acl/Role',
+  Permission: 'Adonis/Acl/Permission'
+}
 ```
 
-or manually clone the repo and then run `npm install`.
+Add the middlewares in the `kernel.js`:
 
-
-### Migrations
-
-Run the following command to run startup migrations.
-
-```js
-adonis migration:run
 ```
+const globalMiddleware = [
+  ...
+  'Adonis/Acl/Init'
+]
+const namedMiddleware = {
+  ...
+  is: 'Adonis/Acl/Is',
+  can: 'Adonis/Acl/Can'
+}
+```
+
+Atdd the following function to the model `User.js`:
+
+```
+  static get traits () {
+    return [
+      '@provider:Adonis/Acl/HasRole',
+      '@provider:Adonis/Acl/HasPermission'
+    ]
+  }
+```
+
+Now, run the command:
+
+`$ adonis acl:setup`
+
+This will create the necessary migrations. Now run:
+
+`$ adonis migration:run`
